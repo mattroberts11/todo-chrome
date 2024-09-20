@@ -1,2 +1,2 @@
-# chatgpt-chrome
-Use Chat GPT or Claude as a browser extension
+# todo-chrome
+A simple ToDo list as a browser extension
