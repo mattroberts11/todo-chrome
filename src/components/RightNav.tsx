@@ -1,9 +1,27 @@
 import React from "react";
 
-import { Box, IconButton } from "@mui/joy";
+import { Box, IconButton, Stack, Typography } from "@mui/joy";
 import { useTheme } from "@mui/joy";
 
 import AddTask from "@mui/icons-material/AddTask";
+// import ListIcon from "@mui/icons-material/List";
+import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+
+const ButtonWrapper: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+      }}
+    >
+      {children}
+    </Box>
+  );
+};
 
 const RightNav: React.FC = () => {
   const theme = useTheme();
@@ -18,7 +36,7 @@ const RightNav: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         gap: 4,
-        pt: "64px",
+        pt: "104px",
         pb: 4,
         maxWidth: "60px",
         alignItems: "center",
@@ -26,14 +44,29 @@ const RightNav: React.FC = () => {
         flexGrow: 1,
       }}
     >
-      <Box
+      <Stack
         id="button-wrapper"
-        sx={{ display: "flex", flexDirection: "column" }}
+        direction={"column"}
+        spacing={2}
+        sx={{ justifyContent: "center", alignItems: "center" }}
       >
-        <IconButton variant="plain">
-          <AddTask />
-        </IconButton>
-      </Box>
+        <ButtonWrapper>
+          <IconButton variant="plain">
+            <AddTask sx={{ display: "block" }} />
+          </IconButton>
+          <Typography level="body-sm" sx={{ fontSize: "10px", mt: 0 }}>
+            Add Task
+          </Typography>
+        </ButtonWrapper>
+        <ButtonWrapper>
+          <IconButton variant="plain">
+            <PlaylistAddIcon />
+          </IconButton>
+          <Typography level="body-sm" sx={{ fontSize: "10px", mt: 0 }}>
+            Add List
+          </Typography>
+        </ButtonWrapper>
+      </Stack>
     </Box>
   );
 };
