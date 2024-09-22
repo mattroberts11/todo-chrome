@@ -1,6 +1,8 @@
 import React from "react";
 import { Box } from "@mui/joy";
+import Footer from "./Footer";
 import Header from "./Header";
+import MainContent from "./MainContent";
 
 const MainPanel: React.FC = () => {
   return (
@@ -18,6 +20,8 @@ const MainPanel: React.FC = () => {
       }}
     >
       <Header />
+      <MainContent />
+      <Footer />
     </Box>
   );
 };
