@@ -13,7 +13,7 @@ const theme = extendTheme({
     light: {
       palette: {
         background: {
-          body: "#ffffff",
+          body: "#e1e1e1",
         },
       },
     },
