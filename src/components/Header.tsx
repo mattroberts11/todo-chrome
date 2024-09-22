@@ -9,8 +9,9 @@ const Header: React.FC = () => (
     sx={{
       display: "flex",
       justifyContent: "space-between",
-      height: "64px",
-      p: 2,
+      alignItems: "center",
+      height: "54px",
+      p: 1,
       top: 0,
       position: "sticky",
     }}
