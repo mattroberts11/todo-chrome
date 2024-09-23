@@ -13,8 +13,12 @@ const MainContent: React.FC = () => {
         flexGrow: 1,
         p: 1,
       }}
+      id="main-content"
+      role="main"
     >
-      <Typography component="h1">Main Content</Typography>
+      <Typography component="h3" aria-label="All Tasks Heading">
+        All Tasks
+      </Typography>
     </Box>
   );
 };

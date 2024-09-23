@@ -39,6 +39,7 @@ const Footer: React.FC = () => {
         bottom: 0,
         position: "sticky",
       }}
+      role="contentinfo"
     >
       <Box
         sx={{
@@ -52,13 +53,16 @@ const Footer: React.FC = () => {
       >
         <Stack direction="row" width="100%" justifyContent="space-around">
           <ButtonWrapper>
-            <IconButton variant="plain">
+            <IconButton variant="plain" aria-label="Go to Home">
               <HomeIcon sx={{ display: "block" }} />
             </IconButton>
           </ButtonWrapper>
           <ButtonWrapper>
             <IconButton variant="plain">
-              <TodayIcon sx={{ display: "block" }} />
+              <TodayIcon
+                sx={{ display: "block" }}
+                aria-label="View Today's Tasks"
+              />
             </IconButton>
           </ButtonWrapper>
           <Box id="mid-spacer" sx={{ width: "40px", position: "relative" }}>
@@ -86,18 +90,22 @@ const Footer: React.FC = () => {
                   height: "55px",
                   borderRadius: "50%",
                 }}
+                aria-label="Add a new task"
               >
                 <AddIcon />
               </IconButton>
             </Box>
           </Box>
           <ButtonWrapper>
-            <IconButton variant="plain">
+            <IconButton
+              variant="plain"
+              aria-label="Veiw tasks on a certian date"
+            >
               <CalendarMonthIcon sx={{ display: "block" }} />
             </IconButton>
           </ButtonWrapper>
           <ButtonWrapper>
-            <IconButton variant="plain">
+            <IconButton variant="plain" aria-label="Application settings">
               <SettingsIcon sx={{ display: "block" }} />
             </IconButton>
           </ButtonWrapper>

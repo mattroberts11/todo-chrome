@@ -60,13 +60,14 @@ const ModeToggle: React.FC = () => {
     <Switch
       color={mode === "dark" ? "primary" : "success"}
       size="sm"
-      slotProps={{ input: { "aria-label": "dark mode" } }}
+      slotProps={{ input: { "aria-label": "Toggle dark mode" } }}
       startDecorator={
         <LightModeIcon
           sx={{
             color: mode === "dark" ? "text.tertiary" : "success.500",
             width: "16px",
           }}
+          aria-hidden="true"
         />
       }
       endDecorator={
@@ -75,10 +76,13 @@ const ModeToggle: React.FC = () => {
             color: mode === "dark" ? "primary.500" : "text.tertiary",
             width: "16px",
           }}
+          aria-hidden="true"
         />
       }
       checked={mode === "dark"}
       onChange={handleChange}
+      aria-checked={mode === "dark"}
+      role="switch"
     />
   );
 };

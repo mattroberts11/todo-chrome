@@ -16,7 +16,7 @@ const Header: React.FC = () => (
       position: "sticky",
     }}
   >
-    <Typography level="h4" component="h1">
+    <Typography level="h4" component="h1" aria-label="Application Title">
       ToDo Today!
     </Typography>
     <ModeToggle />
