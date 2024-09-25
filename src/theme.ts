@@ -1,19 +1,21 @@
-import { extendTheme } from "@mui/joy";
+import { extendTheme, colors } from "@mui/joy";
 
 const theme = extendTheme({
   colorSchemes: {
     dark: {
       palette: {
         background: {
-          body: "#242424",
-          surface: "#242424",
+          body: colors.grey[800],
+          surface: colors.grey[800],
         },
       },
     },
     light: {
       palette: {
         background: {
-          body: "#e1e1e1",
+          body: colors.grey[100],
+          surface: colors.grey[100],
+          level3: colors.blue[200],
         },
       },
     },
