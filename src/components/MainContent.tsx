@@ -1,6 +1,7 @@
 import React from "react";
 
 import { Box, Typography } from "@mui/joy";
+import List from "./List";
 
 const MainContent: React.FC = () => {
   return (
@@ -19,6 +20,7 @@ const MainContent: React.FC = () => {
       <Typography component="h3" aria-label="All Tasks Heading">
         All Tasks
       </Typography>
+      <List />
     </Box>
   );
 };
