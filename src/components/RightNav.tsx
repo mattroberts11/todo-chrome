@@ -33,7 +33,7 @@ const RightNav: React.FC = () => {
         boxSizing: "border-box",
         width: "60px",
         height: "100%",
-        display: "flex",
+        display: "none",
         flexDirection: "column",
         gap: 4,
         pt: "104px",
