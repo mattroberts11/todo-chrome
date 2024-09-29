@@ -1,12 +1,25 @@
-// Define the type for a list item
-type ListItem = {
-  id: number;
-  value: string;
-  completed: boolean;
-  dueDate: string;
+type Action =
+  | { type: "SET_TODO_LIST"; payload: ToDo[] }
+  | { type: "SET_IS_ADDING_TODO"; payload: boolean }
+  | { type: "SET_TODO"; payload: ToDo }
+  | { type: "CLEAR_TODO" };
+
+type AppState = {
+  isAddingTodo: boolean;
+  todo: ToDo;
+  todoList: ToDo[];
 };
 
-// Define the type for the list
-type List = {
-  items: ListItem[];
+type DispatchTypes =
+  | "SET_TODO_LIST"
+  | "SET_IS_ADDING_TODO"
+  | "SET_TODO"
+  | "CLEAR_TODO";
+
+type ToDo = {
+  id: number;
+  text: string;
+  completed: boolean;
+  dateAdded: string;
+  dueDate: string;
 };
