@@ -2,6 +2,7 @@ import React from "react";
 import "@fontsource/inter";
 import { CssVarsProvider } from "@mui/joy/styles";
 import { CssBaseline } from "@mui/joy";
+import { AppProvider } from "./AppContext";
 
 import "./App.css";
 import theme from "./theme";
@@ -11,7 +12,9 @@ const App: React.FC = () => {
   return (
     <CssVarsProvider theme={theme}>
       <CssBaseline />
-      <Sidebar />
+      <AppProvider>
+        <Sidebar />
+      </AppProvider>
     </CssVarsProvider>
   );
 };

@@ -1,14 +1,19 @@
-import React, { createContext, ReactNode } from "react";
+import React, { createContext, ReactNode, useReducer } from "react";
+import { initialState } from "./store/initialState";
+import { reducer } from "./store/reducer";
 
 type AppContextProps = {
-  state: string;
-  dispatch: React.Dispatch<React.SetStateAction<string>>;
+  state: AppState;
+  dispatch: React.Dispatch<Action>;
 };
 
-const AppContext = createContext<AppContextProps | undefined>(undefined);
+const AppContext = createContext<AppContextProps>({
+  state: initialState,
+  dispatch: () => {},
+});
 
 const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [state, dispatch] = React.useState<string>("");
+  const [state, dispatch] = useReducer(reducer, initialState);
 
   return (
     <AppContext.Provider value={{ state, dispatch }}>
