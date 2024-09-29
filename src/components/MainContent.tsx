@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useContext } from "react";
 
+import { AppContext } from "../AppContext";
 import { Box, Typography } from "@mui/joy";
+import AddToDo from "./AddToDo";
 import List from "./List";
 
 const MainContent: React.FC = () => {
+  const appContext = useContext(AppContext);
+  const { state } = appContext;
   return (
     <Box
       sx={{
@@ -20,7 +24,7 @@ const MainContent: React.FC = () => {
       <Typography component="h3" aria-label="All Tasks Heading">
         All Tasks
       </Typography>
-      <List />
+      {state.isAddingTodo ? <AddToDo /> : <List />}
     </Box>
   );
 };

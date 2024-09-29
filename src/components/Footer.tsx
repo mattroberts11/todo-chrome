@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Box, IconButton, Stack } from "@mui/joy";
 import { useTheme } from "@mui/joy";
 
+import { AppContext } from "../AppContext";
 import AddIcon from "@mui/icons-material/Add";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import HomeIcon from "@mui/icons-material/Home";
@@ -26,6 +27,13 @@ const ButtonWrapper: React.FC<{ children: React.ReactNode }> = ({
 
 const Footer: React.FC = () => {
   const theme = useTheme();
+  const appContext = useContext(AppContext);
+  const { dispatch } = appContext;
+
+  const handleAddTodoClick = () => {
+    console.log("Add a new todo");
+    dispatch({ type: "SET_IS_ADDING_TODO", payload: true });
+  };
 
   return (
     <Box
@@ -92,7 +100,7 @@ const Footer: React.FC = () => {
                 }}
                 aria-label="Add a new task"
               >
-                <AddIcon />
+                <AddIcon onClick={handleAddTodoClick} />
               </IconButton>
             </Box>
           </Box>
