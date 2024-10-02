@@ -11,57 +11,29 @@ import {
 } from "@mui/joy";
 
 const AddToDo: React.FC = () => {
-  const { dispatch } = React.useContext(AppContext);
+  const { state, dispatch } = React.useContext(AppContext);
   const [value, setValue] = useState("");
-  interface Todo {
-    id: number;
-    text: string;
-    completed: boolean;
-    dateAdded: string;
-    dueDate: string;
-  }
-
-  const [todos, setTodos] = useState<Todo[]>([]);
 
   const storage = chrome.storage.sync;
 
-  React.useEffect(() => {
-    getTodos();
-  }, []);
-
-  const getTodos = async () => {
-    await storage.get(["todos"], (result) => {
-      const todos = result.todos || [];
-      if (todos.length > 0) {
-        setTodos(todos);
-      }
-    });
-  };
-
   const handleSaveClick = async () => {
-    // Retrieve the current list of todos from Chrome storage
-
-    const todoId = todos.length + 1;
-
+    const todoId = (state.todoStorage?.length ? 1 : 0).toString();
+    const todoKey = "todo_" + todoId;
     // Add the new todo to the list
-    const newTodo = {
-      id: todoId,
+    const newTodo: ToDo = {
+      id: todoKey,
       text: value,
       completed: false,
       dateAdded: new Date().toISOString(),
       dueDate: "",
     };
-    todos.push(newTodo);
-    console.log("New todo added", newTodo);
-    // Save the updated list back to Chrome storage
 
-    await storage.set({ todos: todos }, () => {
-      console.log("Todo saved to Chrome storage");
-      dispatch({ type: "SET_TODO_LIST", payload: todos });
-      // Dispatch action to update state
-      dispatch({ type: "SET_IS_ADDING_TODO", payload: false });
+    // Save the todo to Chrome storage
+    await storage.set({ [todoKey]: newTodo }, () => {
+      console.log("Todo saved to Chrome storage", { [todoKey]: newTodo });
+      dispatch({ type: "ADD_TODO", payload: newTodo });
+      dispatch({ type: "SET_IS_ADDING_TODO", payload: false }); // shows the or hides the add form
     });
-    console.log("sync storage", storage);
   };
   const handleCancelClick = () => {
     dispatch({ type: "SET_IS_ADDING_TODO", payload: false });

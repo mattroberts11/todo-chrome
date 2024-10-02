@@ -16,6 +16,7 @@ import { useColorScheme } from "@mui/joy/styles";
 import { Switch } from "@mui/joy";
 
 import LightModeIcon from "@mui/icons-material/LightMode";
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import ModeNightIcon from "@mui/icons-material/ModeNight";
 
 const ModeToggle: React.FC = () => {
@@ -58,17 +59,25 @@ const ModeToggle: React.FC = () => {
 
   return (
     <Switch
-      color={mode === "dark" ? "primary" : "success"}
+      color={mode === "dark" ? "primary" : "neutral"}
       size="sm"
       slotProps={{ input: { "aria-label": "Toggle dark mode" } }}
       startDecorator={
-        <LightModeIcon
-          sx={{
-            color: mode === "dark" ? "text.tertiary" : "success.500",
-            width: "16px",
-          }}
-          aria-hidden="true"
-        />
+        mode === "dark" ? (
+          <LightModeIcon
+            sx={{
+              width: "16px",
+            }}
+            aria-hidden="true"
+          />
+        ) : (
+          <LightModeOutlinedIcon
+            sx={{
+              width: "16px",
+            }}
+            aria-hidden="true"
+          />
+        )
       }
       endDecorator={
         <ModeNightIcon

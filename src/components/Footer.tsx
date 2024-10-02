@@ -35,6 +35,18 @@ const Footer: React.FC = () => {
     dispatch({ type: "SET_IS_ADDING_TODO", payload: true });
   };
 
+  const clearAllStorage = () => {
+    chrome.storage.sync.clear(() => {
+      if (chrome.runtime.lastError) {
+        console.error("Error clearing storage:", chrome.runtime.lastError);
+      } else {
+        alert("All storage has been cleared");
+        // Update your app state here
+        dispatch({ type: "SET_TODO_STORAGE", payload: [] });
+      }
+    });
+  };
+
   return (
     <Box
       component={"footer"}
@@ -99,8 +111,9 @@ const Footer: React.FC = () => {
                   borderRadius: "50%",
                 }}
                 aria-label="Add a new task"
+                onClick={handleAddTodoClick}
               >
-                <AddIcon onClick={handleAddTodoClick} />
+                <AddIcon />
               </IconButton>
             </Box>
           </Box>
@@ -113,7 +126,11 @@ const Footer: React.FC = () => {
             </IconButton>
           </ButtonWrapper>
           <ButtonWrapper>
-            <IconButton variant="plain" aria-label="Application settings">
+            <IconButton
+              variant="plain"
+              aria-label="Application settings"
+              onClick={clearAllStorage}
+            >
               <SettingsIcon sx={{ display: "block" }} />
             </IconButton>
           </ButtonWrapper>

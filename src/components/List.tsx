@@ -1,12 +1,13 @@
 import React from "react";
 import { AppContext } from "../AppContext";
-import { colors, Box, List, ListItem } from "@mui/joy";
+import { colors, Box, IconButton, List, ListItem } from "@mui/joy";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useTheme } from "@mui/joy";
 
 const TodoList: React.FC = () => {
   const theme = useTheme();
 
-  const { state } = React.useContext(AppContext);
+  const { state, dispatch } = React.useContext(AppContext);
   console.log("TodoList render, state:", state);
   /*
 ToDo:
@@ -14,13 +15,17 @@ In line editing click on todo and it turns into input to edit
 In line delete
 Check off todo and add to completed
 */
+  const handleDelete = (id: string) => {
+    console.log("deleted todo with id: ", id);
+    dispatch({ type: "DELETE_TODO", payload: id });
+  };
 
   return (
     <List>
-      {state.todoList && state.todoList.length > 0 ? (
-        state.todoList.map((todo) => (
+      {state.todoStorage && state.todoStorage.length > 0 ? (
+        state.todoStorage.map((todo, i) => (
           <ListItem
-            key={todo.id}
+            key={i}
             sx={{
               display: "flex",
               flexDirection: "row",
@@ -45,10 +50,15 @@ Check off todo and add to completed
               className="todo-text-wrapper"
               sx={{ display: "flex", flexDirection: "column" }}
             >
-              <Box className="todo-text">{todo.text}</Box>
+              <Box className="todo-text">{String(todo.text)}</Box>
               <Box className="todo-date" sx={{ fontSize: "8px" }}>
                 Thur. Sept 26, 2024
               </Box>
+            </Box>
+            <Box className="todo-delete" sx={{ marginLeft: "auto" }}>
+              <IconButton variant="soft">
+                <DeleteIcon onClick={() => handleDelete(todo.id)} />
+              </IconButton>
             </Box>
           </ListItem>
         ))

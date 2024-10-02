@@ -16,8 +16,13 @@ const Sidebar: React.FC = () => {
   }, []);
 
   const loadChanges = async () => {
-    await storage.get(["todos"], (result) => {
-      dispatch({ type: "SET_TODO_LIST", payload: result.todos });
+    // get all items from storage that start with "todo_" and add to an array
+    await storage.get(null, (items) => {
+      console.log("Loaded todos from storage:", items);
+      const todos = Object.values(items).filter(
+        (item) => item.id && item.id.startsWith("todo_"),
+      );
+      dispatch({ type: "SET_TODO_STORAGE", payload: todos });
     });
   };
 
