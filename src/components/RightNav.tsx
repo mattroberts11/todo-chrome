@@ -4,8 +4,9 @@ import { Box, IconButton, Stack, Typography } from "@mui/joy";
 import { useTheme } from "@mui/joy";
 
 import AddTask from "@mui/icons-material/AddTask";
-// import ListIcon from "@mui/icons-material/List";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+
+import { AppContext } from "../AppContext";
 
 const ButtonWrapper: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -25,6 +26,12 @@ const ButtonWrapper: React.FC<{ children: React.ReactNode }> = ({
 
 const RightNav: React.FC = () => {
   const theme = useTheme();
+  const { dispatch } = React.useContext(AppContext);
+
+  const handleAddTodoClick = () => {
+    console.log("Add a new todo");
+    dispatch({ type: "SET_IS_ADDING_TODO", payload: true });
+  };
 
   return (
     <Box
@@ -51,11 +58,11 @@ const RightNav: React.FC = () => {
         sx={{ justifyContent: "center", alignItems: "center" }}
       >
         <ButtonWrapper>
-          <IconButton variant="plain">
+          <IconButton variant="plain" onClick={handleAddTodoClick}>
             <AddTask sx={{ display: "block" }} />
           </IconButton>
           <Typography level="body-sm" sx={{ fontSize: "10px", mt: 0 }}>
-            Add Task
+            Add Todo
           </Typography>
         </ButtonWrapper>
         <ButtonWrapper>

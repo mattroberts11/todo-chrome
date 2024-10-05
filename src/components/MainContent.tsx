@@ -21,9 +21,11 @@ const MainContent: React.FC = () => {
       id="main-content"
       role="main"
     >
-      <Typography component="h3" aria-label="All Tasks Heading">
-        All Tasks
-      </Typography>
+      {state.isAddingTodo ? null : (
+        <Typography component="h3" aria-label="All Tasks Heading">
+          All Tasks
+        </Typography>
+      )}
       {state.isAddingTodo ? <AddToDo /> : <List />}
     </Box>
   );

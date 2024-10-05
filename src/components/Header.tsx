@@ -17,7 +17,7 @@ const Header: React.FC = () => (
     }}
   >
     <Typography level="h4" component="h1" aria-label="Application Title">
-      ToDo Today!
+      My Tasks
     </Typography>
     <ModeToggle />
   </Box>

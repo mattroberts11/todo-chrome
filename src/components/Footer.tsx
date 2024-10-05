@@ -31,7 +31,6 @@ const Footer: React.FC = () => {
   const { dispatch } = appContext;
 
   const handleAddTodoClick = () => {
-    console.log("Add a new todo");
     dispatch({ type: "SET_IS_ADDING_TODO", payload: true });
   };
 
