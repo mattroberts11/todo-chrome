@@ -1,6 +1,6 @@
 import React from "react";
 import { AppContext } from "../AppContext";
-import { colors, Box, IconButton, List, ListItem } from "@mui/joy";
+import { Box, Checkbox, IconButton, List, ListItem } from "@mui/joy";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useTheme } from "@mui/joy";
 
@@ -35,28 +35,28 @@ Check off todo and add to completed
               marginBottom: "8px",
             }}
           >
-            <Box
+            <Checkbox
               className="todo-checkbox"
+              size="md"
+              color="primary"
+              variant="outlined"
               sx={{
-                width: "20px",
-                height: "20px",
-                border: `1px solid ${colors.blue[400]}`,
-                backgroundColor: colors.blue[100],
-                borderRadius: "5px",
                 marginRight: "5px",
               }}
-            ></Box>
+            ></Checkbox>
             <Box
               className="todo-text-wrapper"
               sx={{ display: "flex", flexDirection: "column" }}
             >
-              <Box className="todo-text">{String(todo.text)}</Box>
+              <Box className="todo-text" sx={{ overflowWrap: "anywhere" }}>
+                {String(todo.text)}
+              </Box>
               <Box className="todo-date" sx={{ fontSize: "8px" }}>
                 Thur. Sept 26, 2024
               </Box>
             </Box>
             <Box className="todo-delete" sx={{ marginLeft: "auto" }}>
-              <IconButton variant="soft">
+              <IconButton variant="plain">
                 <DeleteIcon onClick={() => handleDelete(todo.id)} />
               </IconButton>
             </Box>
