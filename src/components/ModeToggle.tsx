@@ -1,13 +1,14 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 // Declare chrome as a global variable
 declare const chrome: {
   storage: {
-    sync: {
+    local: {
       get: (
         key: string,
         callback: (data: { [key: string]: string }) => void,
       ) => void;
+      set: (data: { [key: string]: string }) => void;
     };
   };
 };
@@ -20,40 +21,63 @@ import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import ModeNightIcon from "@mui/icons-material/ModeNight";
 
 const ModeToggle: React.FC = () => {
-  const { mode, setMode } = useColorScheme();
+  const { setMode } = useColorScheme();
+  const [mode, setLocalMode] = useState<"light" | "dark">("light");
+  const [mounted, setMounted] = useState(false);
 
-  const [mounted, setMounted] = React.useState(false);
+  useEffect(() => {
+    const getInitialMode = async () => {
+      if (
+        typeof chrome !== "undefined" &&
+        chrome.storage &&
+        chrome.storage.local
+      ) {
+        chrome.storage.local.get("theme", (data) => {
+          const storedTheme: "light" | "dark" =
+            data.theme === "dark" ? "dark" : "light";
+          setLocalMode(storedTheme);
+          setMode(storedTheme);
+        });
+      } else {
+        const systemPrefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        setLocalMode(systemPrefersDark ? "dark" : "light");
+        setMode(systemPrefersDark ? "dark" : "light");
+      }
+      setMounted(true);
+    };
 
-  React.useEffect(() => {
-    // check if chrome.storage.sync is available to set theme
+    getInitialMode();
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = (e: MediaQueryListEvent) => {
+      const newMode = e.matches ? "dark" : "light";
+      setLocalMode(newMode);
+      setMode(newMode);
+    };
+
+    mediaQuery.addListener(handleChange);
+    return () => mediaQuery.removeListener(handleChange);
+  }, [setMode]);
+
+  useEffect(() => {
     if (
       typeof chrome !== "undefined" &&
       chrome.storage &&
-      chrome.storage.sync
+      chrome.storage.local
     ) {
-      chrome.storage.sync.get("theme", (data) => {
-        const storedTheme: "light" | "dark" | null =
-          data.theme === "dark" ? "dark" : "light"; // default to light if not set
-        setMode(storedTheme);
-        // necessary for server-side rendering
-        // because mode is undefined on the server
-        setMounted(true);
-      });
-    } else {
-      // Fallback to system preference if chrome.storage.sync is not available
-      const systemPrefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)",
-      ).matches;
-      setMode(systemPrefersDark ? "dark" : "light");
-      setMounted(true);
+      chrome.storage.local.set({ theme: mode });
     }
-  }, [setMode]);
+  }, [mode]);
+
   if (!mounted) {
     return null;
   }
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newMode = event.target.checked ? "dark" : "light";
+    setLocalMode(newMode);
     setMode(newMode);
   };
 
