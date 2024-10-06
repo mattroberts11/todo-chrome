@@ -1,23 +1,28 @@
 import React, { useContext } from "react";
-import { Box, IconButton, Stack } from "@mui/joy";
+import { Box, IconButton, Stack, Tooltip } from "@mui/joy";
 import { useTheme } from "@mui/joy";
 
 import { AppContext } from "../AppContext";
 import AddIcon from "@mui/icons-material/Add";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+// import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import HomeIcon from "@mui/icons-material/Home";
 import SettingsIcon from "@mui/icons-material/Settings";
 import TodayIcon from "@mui/icons-material/Today";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
-const ButtonWrapper: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+type ButtonWrapperProps = {
+  children: React.ReactNode;
+  sx?: object;
+};
+
+const ButtonWrapper: React.FC<ButtonWrapperProps> = ({ children, sx = {} }) => {
   return (
     <Box
       sx={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        ...sx,
       }}
     >
       {children}
@@ -72,19 +77,26 @@ const Footer: React.FC = () => {
       >
         <Stack direction="row" width="100%" justifyContent="space-around">
           <ButtonWrapper>
-            <IconButton variant="plain" aria-label="Go to Home">
+            <IconButton
+              variant="plain"
+              aria-label="Go to Home"
+              sx={{ display: "none" }}
+            >
               <HomeIcon sx={{ display: "block" }} />
             </IconButton>
           </ButtonWrapper>
           <ButtonWrapper>
-            <IconButton variant="plain">
+            <IconButton variant="plain" sx={{ display: "none" }}>
               <TodayIcon
                 sx={{ display: "block" }}
                 aria-label="View Today's Tasks"
               />
             </IconButton>
           </ButtonWrapper>
-          <Box id="mid-spacer" sx={{ width: "40px", position: "relative" }}>
+          <Box
+            id="mid-spacer"
+            sx={{ width: "40px", marginLeft: "10%", position: "relative" }}
+          >
             <Box
               sx={{
                 position: "absolute",
@@ -118,20 +130,30 @@ const Footer: React.FC = () => {
           </Box>
           <ButtonWrapper>
             <IconButton
+              sx={{ display: "none" }}
               variant="plain"
-              aria-label="Veiw tasks on a certian date"
+              aria-label="Application settings"
             >
-              <CalendarMonthIcon sx={{ display: "block" }} />
+              <SettingsIcon />
             </IconButton>
           </ButtonWrapper>
           <ButtonWrapper>
-            <IconButton
-              variant="plain"
-              aria-label="Application settings"
-              onClick={clearAllStorage}
+            <Tooltip
+              color="danger"
+              variant="solid"
+              size="sm"
+              title="This will delete All tasks forever!"
+              placement="top"
+              arrow
             >
-              <SettingsIcon sx={{ display: "block" }} />
-            </IconButton>
+              <IconButton
+                variant="plain"
+                aria-label="Delete all tasks"
+                onClick={clearAllStorage}
+              >
+                <DeleteForeverIcon sx={{ display: "block" }} />
+              </IconButton>
+            </Tooltip>
           </ButtonWrapper>
         </Stack>
       </Box>
