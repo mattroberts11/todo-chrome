@@ -7,12 +7,16 @@ const TaskInput = ({
   inputVariant = "outlined",
   showButtonsUnderInput,
   inputRef,
+  inputSize,
+  marginTop,
   onSave,
 }: {
   initialValue: string;
   inputVariant: "plain" | "outlined" | "soft" | "solid";
   showButtonsUnderInput?: boolean;
   inputRef: React.RefObject<HTMLInputElement>;
+  inputSize?: "sm" | "md" | "lg";
+  marginTop?: number;
   onSave?: (newText: string) => void;
 }): JSX.Element => {
   const { state, dispatch } = React.useContext(AppContext);
@@ -67,6 +71,9 @@ const TaskInput = ({
       setError("The task cannot be empty");
       return;
     }
+    // TODO:
+    // check if the key from storage already exists
+    // if it does, increment the key by 1
 
     const todoId = (state.todoStorage?.length ?? 0).toString();
     const todoKey = "todo_" + todoId;
@@ -76,6 +83,7 @@ const TaskInput = ({
       completed: false,
       dateAdded: new Date().toISOString(),
       dueDate: "",
+      order: state.todoStorage?.length ?? 0,
     };
 
     console.log("New todo object:", newTodo); // Debug log
@@ -114,12 +122,11 @@ const TaskInput = ({
                 onChange: handleInputChange,
               },
             }}
-            size="lg"
+            size={inputSize}
             aria-label="New Task Input"
-            sx={{ mt: 2 }}
+            sx={{ mt: marginTop }}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            // onBlur={handleSave}
           />
           {remainingChars !== null && (
             <Typography level="body-xs" color="warning">

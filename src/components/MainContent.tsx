@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import { AppContext } from "../AppContext";
 import { Box, Typography } from "@mui/joy";
 import AddToDo from "./AddToDo";
-import List from "./List";
+import TaskList from "./TaskList";
 
 const MainContent: React.FC = () => {
   const appContext = useContext(AppContext);
@@ -26,7 +26,7 @@ const MainContent: React.FC = () => {
           All Tasks
         </Typography>
       )}
-      {state.isAddingTodo ? <AddToDo /> : <List />}
+      {state.isAddingTodo ? <AddToDo /> : <TaskList />}
     </Box>
   );
 };

@@ -25,6 +25,8 @@ const AddToDo: React.FC = () => {
         inputVariant="outlined"
         showButtonsUnderInput={true}
         inputRef={inputRef}
+        inputSize="lg"
+        marginTop={2}
       />
     </Box>
   );

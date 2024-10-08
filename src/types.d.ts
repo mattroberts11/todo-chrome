@@ -34,4 +34,5 @@ type ToDo = {
   completed: boolean;
   dateAdded: string;
   dueDate: string;
+  order: number;
 };

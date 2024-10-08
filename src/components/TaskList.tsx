@@ -81,96 +81,85 @@ const TodoList: React.FC = () => {
   };
 
   const renderTodoItem = (todo: ToDo) => (
-    <motion.div
+    <ListItem
+      key={`${todo.id}`}
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        background: theme.palette.background.level3,
+        borderRadius: "8px",
+        padding: "10px",
+        marginBottom: "8px",
+      }}
       layout
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -50 }}
       transition={{ duration: 0.3 }}
-      key={todo.id}
+      component={motion.li}
     >
-      <ListItem
-        key={`${todo.id}`}
+      <Checkbox
+        className="todo-checkbox"
+        size="md"
+        color="primary"
+        variant="outlined"
         sx={{
-          display: "flex",
-          flexDirection: "row",
-          background: theme.palette.background.level3,
-          borderRadius: "8px",
-          padding: "10px",
-          marginBottom: "8px",
+          marginRight: "5px",
         }}
-        component={motion.li}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
-        exit={{ opacity: 0 }}
+        checked={todo.completed}
+        onChange={() => handleCheck(todo)}
+      />
+      <Box
+        className="todo-text-wrapper"
+        sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}
       >
-        <Checkbox
-          className="todo-checkbox"
-          size="md"
-          color="primary"
-          variant="outlined"
-          sx={{
-            marginRight: "5px",
-          }}
-          checked={todo.completed}
-          onChange={() => handleCheck(todo)}
-        />
         <Box
-          className="todo-text-wrapper"
-          sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}
+          className="todo-text"
+          sx={{
+            overflowWrap: "anywhere",
+            "&:hover": { cursor: "pointer" },
+          }}
+          onClick={() => handleEdit(todo.id)}
+          onMouseEnter={() => setHoveredId(todo.id)}
+          onMouseLeave={() => setHoveredId(null)}
         >
-          <Box
-            className="todo-text"
-            sx={{
-              overflowWrap: "anywhere",
-              "&:hover": { cursor: "pointer" },
-            }}
-            onClick={() => handleEdit(todo.id)}
-            onMouseEnter={() => setHoveredId(todo.id)}
-            onMouseLeave={() => setHoveredId(null)}
-          >
-            {editingId === todo.id ? (
-              <TaskInput
-                initialValue={todo.text}
-                inputVariant="plain"
-                showButtonsUnderInput={false}
-                inputRef={inputRef}
-                onSave={(newText) => handleEditSave(todo.id, newText)}
-              />
-            ) : (
-              <Box
-                component={"span"}
+          {editingId === todo.id ? (
+            <TaskInput
+              initialValue={todo.text}
+              inputVariant="plain"
+              showButtonsUnderInput={false}
+              inputRef={inputRef}
+              onSave={(newText) => handleEditSave(todo.id, newText)}
+            />
+          ) : (
+            <Box
+              component={"span"}
+              sx={{
+                textDecoration: todo.completed ? "line-through" : "none",
+              }}
+            >
+              {String(todo.text)}
+              <IconButton
+                variant="plain"
+                onClick={() => handleEdit(todo.id)}
                 sx={{
-                  textDecoration: todo.completed ? "line-through" : "none",
+                  fontSize: "12px",
+                  display: hoveredId === todo.id ? "inline-flex" : "none",
                 }}
+                size="sm"
               >
-                {String(todo.text)}
-              </Box>
-            )}
-          </Box>
+                <EditIcon />
+              </IconButton>
+            </Box>
+          )}
         </Box>
-        <Box className="todo-delete">
-          <IconButton
-            variant="plain"
-            onClick={() => handleEdit(todo.id)}
-            sx={{
-              display: hoveredId === todo.id ? "block" : "none",
-            }}
-          >
-            <EditIcon />
-          </IconButton>
-          <IconButton
-            variant="plain"
-            onClick={() => handleDelete(todo.id)}
-            sx={{
-              display: hoveredId === todo.id ? "none" : "block",
-            }}
-          >
-            <DeleteIcon />
-          </IconButton>
-        </Box>
-      </ListItem>
-    </motion.div>
+      </Box>
+      <Box className="todo-delete">
+        <IconButton variant="plain" onClick={() => handleDelete(todo.id)}>
+          <DeleteIcon />
+        </IconButton>
+      </Box>
+    </ListItem>
   );
 
   const activeTodos = state.todoStorage.filter((todo) => !todo.completed);
