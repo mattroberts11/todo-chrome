@@ -32,6 +32,7 @@ type ToDo = {
   id: string;
   text: string;
   completed: boolean;
+  dragId: string;
   dateAdded: string;
   dueDate: string;
   order: number;

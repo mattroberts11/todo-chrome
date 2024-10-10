@@ -1,19 +1,16 @@
 import React from "react";
 import { AppContext } from "../AppContext";
-import {
-  Box,
-  Checkbox,
-  IconButton,
-  List,
-  ListItem,
-  Typography,
-} from "@mui/joy";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditIcon from "@mui/icons-material/Edit";
-import { useTheme } from "@mui/joy";
-import { motion, AnimatePresence } from "framer-motion";
+import { Box, List, ListItem, Typography } from "@mui/joy";
 
-import TaskInput from "./TaskInput";
+import { useTheme } from "@mui/joy";
+import {
+  motion,
+  AnimatePresence,
+  Reorder,
+  useDragControls,
+} from "framer-motion";
+
+import TaskItem from "./TaskItem";
 
 const TodoList: React.FC = () => {
   const theme = useTheme();
@@ -21,8 +18,10 @@ const TodoList: React.FC = () => {
   const { state, dispatch } = React.useContext(AppContext);
   const [editingId, setEditingId] = React.useState<string | null>(null);
   const [hoveredId, setHoveredId] = React.useState<string | null>(null);
+  const [activeTodos, setActiveTodos] = React.useState<ToDo[]>([]);
 
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const dragControls = useDragControls();
 
   const handleDelete = (id: string) => {
     dispatch({ type: "DELETE_TODO", payload: id });
@@ -80,105 +79,91 @@ const TodoList: React.FC = () => {
     setEditingId(null);
   };
 
-  const renderTodoItem = (todo: ToDo) => (
-    <ListItem
-      key={`${todo.id}`}
-      sx={{
-        display: "flex",
-        flexDirection: "row",
-        background: theme.palette.background.level3,
-        borderRadius: "8px",
-        padding: "10px",
-        marginBottom: "8px",
-      }}
-      layout
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -50 }}
-      transition={{ duration: 0.3 }}
-      component={motion.li}
-    >
-      <Checkbox
-        className="todo-checkbox"
-        size="md"
-        color="primary"
-        variant="outlined"
-        sx={{
-          marginRight: "5px",
-        }}
-        checked={todo.completed}
-        onChange={() => handleCheck(todo)}
-      />
-      <Box
-        className="todo-text-wrapper"
-        sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}
-      >
-        <Box
-          className="todo-text"
-          sx={{
-            overflowWrap: "anywhere",
-            "&:hover": { cursor: "pointer" },
-          }}
-          onClick={() => handleEdit(todo.id)}
-          onMouseEnter={() => setHoveredId(todo.id)}
-          onMouseLeave={() => setHoveredId(null)}
-        >
-          {editingId === todo.id ? (
-            <TaskInput
-              initialValue={todo.text}
-              inputVariant="plain"
-              showButtonsUnderInput={false}
-              inputRef={inputRef}
-              onSave={(newText) => handleEditSave(todo.id, newText)}
-            />
-          ) : (
-            <Box
-              component={"span"}
-              sx={{
-                textDecoration: todo.completed ? "line-through" : "none",
-              }}
-            >
-              {String(todo.text)}
-              <IconButton
-                variant="plain"
-                onClick={() => handleEdit(todo.id)}
-                sx={{
-                  fontSize: "12px",
-                  display: hoveredId === todo.id ? "inline-flex" : "none",
-                }}
-                size="sm"
-              >
-                <EditIcon />
-              </IconButton>
-            </Box>
-          )}
-        </Box>
-      </Box>
-      <Box className="todo-delete">
-        <IconButton variant="plain" onClick={() => handleDelete(todo.id)}>
-          <DeleteIcon />
-        </IconButton>
-      </Box>
-    </ListItem>
-  );
+  const handleReorder = (newOrder: ToDo[]) => {
+    console.log("New order:", newOrder);
+    const updatedOrder = newOrder.map((todo, index) => {
+      return { ...todo, id: `todo_${index}`, order: index };
+    });
 
-  const activeTodos = state.todoStorage.filter((todo) => !todo.completed);
+    dispatch({ type: "SET_TODO_STORAGE", payload: updatedOrder });
+    // You may want to update the order in storage as well
+    // newOrder.forEach((todo, index) => {
+    //   updateTodoInStorage({ ...todo, order: index }, false);
+    // });
+
+    // find the key in storage
+    // swap the contents of the two keys that have changed
+    // order 0 goes to todo_0
+    // order 1 goes to todo_1 etc...
+  };
+
+  // const activeTodos = state.todoStorage.filter((todo) => !todo.completed);
   const completedTodos = state.todoStorage.filter((todo) => todo.completed);
+
+  React.useEffect(() => {
+    const active = state.todoStorage.filter((todo) => !todo.completed);
+    console.log("Active todos:", active);
+    setActiveTodos(active);
+  }, [state.todoStorage]);
 
   return (
     <Box>
       <Typography level="h4" sx={{ marginBottom: "16px" }}>
         Active Tasks
       </Typography>
-      <AnimatePresence>
-        <List>
+      <Reorder.Group
+        // onReorder={setActiveTodos}
+        onReorder={handleReorder}
+        // axis="y"
+        values={activeTodos}
+        style={{
+          position: "relative",
+          listStyleType: "none",
+          margin: 0,
+          padding: 0,
+        }}
+      >
+        <AnimatePresence>
           {activeTodos.length > 0 ? (
-            activeTodos.map(renderTodoItem)
+            activeTodos.map((todo) => (
+              <Reorder.Item
+                key={`${todo.dragId}`}
+                value={todo}
+                id={todo.id}
+                layout
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -50 }}
+                transition={{ duration: 0.3 }}
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  background: theme.palette.background.level3,
+                  borderRadius: "8px",
+                  padding: "10px",
+                  marginBottom: "8px",
+                  alignItems: "center",
+                }}
+              >
+                <TaskItem
+                  todo={todo}
+                  editingId={editingId}
+                  hoveredId={hoveredId}
+                  onCheck={handleCheck}
+                  onEdit={handleEdit}
+                  onEditSave={handleEditSave}
+                  onDelete={handleDelete}
+                  setHoveredId={setHoveredId}
+                  inputRef={inputRef}
+                  dragControls={dragControls}
+                />
+              </Reorder.Item>
+            ))
           ) : (
             <ListItem>No active todos available</ListItem>
           )}
-        </List>
-      </AnimatePresence>
+        </AnimatePresence>
+      </Reorder.Group>
 
       {completedTodos.length > 0 && (
         <>
@@ -189,7 +174,40 @@ const TodoList: React.FC = () => {
             Completed Tasks
           </Typography>
           <AnimatePresence>
-            <List>{completedTodos.map(renderTodoItem)}</List>
+            <List>
+              {completedTodos.map((todo, i) => (
+                <ListItem
+                  key={i}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    background: theme.palette.background.level3,
+                    borderRadius: "8px",
+                    padding: "10px",
+                    marginBottom: "8px",
+                  }}
+                  component={motion.li}
+                  layout
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -50 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <TaskItem
+                    todo={todo}
+                    editingId={editingId}
+                    hoveredId={hoveredId}
+                    onCheck={handleCheck}
+                    onEdit={handleEdit}
+                    onEditSave={handleEditSave}
+                    onDelete={handleDelete}
+                    setHoveredId={setHoveredId}
+                    inputRef={inputRef}
+                    // dragRef={dragRef}
+                  />
+                </ListItem>
+              ))}
+            </List>
           </AnimatePresence>
         </>
       )}

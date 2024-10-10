@@ -1,6 +1,15 @@
 import React, { useCallback, useState, useEffect } from "react";
-import { Alert, Button, Box, Typography, Input, FormControl } from "@mui/joy";
+import {
+  Alert,
+  Button,
+  Box,
+  Typography,
+  Input,
+  FormControl,
+  IconButton,
+} from "@mui/joy";
 import { AppContext } from "../AppContext";
+import SaveIcon from "@mui/icons-material/Save";
 
 const TaskInput = ({
   initialValue,
@@ -23,7 +32,7 @@ const TaskInput = ({
   const [value, setValue] = useState<string>(initialValue);
   const [error, setError] = useState<string | null>(null);
   const [remainingChars, setRemainingChars] = useState<number | null>(null);
-  // const inputRef = useRef<HTMLInputElement>(null);
+  const dragId = React.useId();
 
   const storage = chrome.storage.sync;
 
@@ -76,12 +85,14 @@ const TaskInput = ({
     // if it does, increment the key by 1
 
     const todoId = (state.todoStorage?.length ?? 0).toString();
+
     const todoKey = "todo_" + todoId;
     const newTodo: ToDo = {
       id: todoKey,
       text: value,
       completed: false,
       dateAdded: new Date().toISOString(),
+      dragId: dragId,
       dueDate: "",
       order: state.todoStorage?.length ?? 0,
     };
@@ -114,6 +125,13 @@ const TaskInput = ({
             placeholder="Add a new task"
             variant={inputVariant}
             color="primary"
+            endDecorator={
+              <>
+                <IconButton variant="soft">
+                  <SaveIcon />
+                </IconButton>
+              </>
+            }
             slotProps={{
               input: {
                 ref: inputRef,
