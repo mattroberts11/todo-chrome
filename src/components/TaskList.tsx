@@ -108,33 +108,31 @@ const TodoList: React.FC = () => {
 
   return (
     <Box>
-      <Typography level="h4" sx={{ marginBottom: "16px" }}>
-        Active Tasks
-      </Typography>
-      <Reorder.Group
-        // onReorder={setActiveTodos}
-        onReorder={handleReorder}
-        // axis="y"
-        values={activeTodos}
-        style={{
-          position: "relative",
-          listStyleType: "none",
-          margin: 0,
-          padding: 0,
-        }}
-      >
-        <AnimatePresence>
+      <AnimatePresence>
+        <Typography level="h4" sx={{ marginBottom: "16px" }}>
+          Active Tasks
+        </Typography>
+        <Reorder.Group
+          // onReorder={setActiveTodos}
+          onReorder={handleReorder}
+          values={activeTodos}
+          style={{
+            position: "relative",
+            listStyleType: "none",
+            margin: 0,
+            padding: 0,
+          }}
+        >
           {activeTodos.length > 0 ? (
             activeTodos.map((todo) => (
               <Reorder.Item
                 key={`${todo.dragId}`}
                 value={todo}
                 id={todo.id}
-                layout
-                initial={{ opacity: 0, y: 50 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -50 }}
-                transition={{ duration: 0.3 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.2 }}
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -160,24 +158,29 @@ const TodoList: React.FC = () => {
               </Reorder.Item>
             ))
           ) : (
-            <ListItem>No active todos available</ListItem>
+            <ListItem>No active tasks available</ListItem>
           )}
-        </AnimatePresence>
-      </Reorder.Group>
+        </Reorder.Group>
 
-      {completedTodos.length > 0 && (
-        <>
-          <Typography
-            level="h4"
-            sx={{ marginTop: "24px", marginBottom: "16px" }}
-          >
-            Completed Tasks
-          </Typography>
-          <AnimatePresence>
+        {completedTodos.length > 0 && (
+          <>
+            <Typography
+              component={motion.h4}
+              level="h4"
+              sx={{ marginTop: "24px", marginBottom: "16px" }}
+              layout
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              Completed Tasks
+            </Typography>
+
             <List>
-              {completedTodos.map((todo, i) => (
+              {completedTodos.map((todo) => (
                 <ListItem
-                  key={i}
+                  key={todo.dragId}
                   sx={{
                     display: "flex",
                     flexDirection: "row",
@@ -208,9 +211,9 @@ const TodoList: React.FC = () => {
                 </ListItem>
               ))}
             </List>
-          </AnimatePresence>
-        </>
-      )}
+          </>
+        )}
+      </AnimatePresence>
     </Box>
   );
 };
