@@ -9,7 +9,7 @@ import {
   Reorder,
   useDragControls,
 } from "framer-motion";
-
+import { updateTodoInStorage } from "../lib/utils";
 import TaskItem from "./TaskItem";
 
 const TodoList: React.FC = () => {
@@ -27,41 +27,9 @@ const TodoList: React.FC = () => {
     dispatch({ type: "DELETE_TODO", payload: id });
   };
 
-  const updateTodoInStorage = (
-    updatedTodo: ToDo,
-    updatingCompleted: boolean,
-  ) => {
-    chrome.storage.sync.get(updatedTodo.id, (result) => {
-      if (chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError);
-        return;
-      }
-
-      if (updatingCompleted) {
-        updatedTodo = { ...updatedTodo, completed: !updatedTodo.completed };
-      }
-      if (result[updatedTodo.id]) {
-        const mergedTodo = { ...result[updatedTodo.id], ...updatedTodo };
-        const updatedData = {
-          [updatedTodo.id]: mergedTodo,
-        };
-
-        chrome.storage.sync.set(updatedData, () => {
-          if (chrome.runtime.lastError) {
-            console.error(chrome.runtime.lastError);
-          } else {
-            console.info("Todo updated successfully");
-          }
-        });
-      } else {
-        console.error("Todo not found in storage");
-      }
-    });
-  };
-
-  const handleCheck = (todo: ToDo) => {
+  const handleCheckCompleted = (todo: ToDo) => {
     const updatedTodo = { ...todo, completed: !todo.completed };
-    updateTodoInStorage(todo, true);
+    updateTodoInStorage(updatedTodo);
     dispatch({ type: "UPDATE_TODO", payload: updatedTodo });
   };
 
@@ -73,28 +41,45 @@ const TodoList: React.FC = () => {
     const todoToUpdate = state.todoStorage.find((todo) => todo.id === todoId);
     if (todoToUpdate) {
       const updatedTodo = { ...todoToUpdate, text: newText };
-      updateTodoInStorage(updatedTodo, false);
+      updateTodoInStorage(updatedTodo);
       dispatch({ type: "UPDATE_TODO", payload: updatedTodo });
     }
     setEditingId(null);
   };
+
+  function updateChromeStorage(todoArray: TodoStorage) {
+    const updatePromises = todoArray.map((todo) => {
+      return new Promise((resolve, reject) => {
+        chrome.storage.sync.set({ [todo.id]: todo }, () => {
+          if (chrome.runtime.lastError) {
+            reject(chrome.runtime.lastError);
+          } else {
+            resolve(void 0);
+          }
+        });
+      });
+    });
+
+    Promise.all(updatePromises)
+      .then(() => {
+        console.log("All todos updated successfully in sync.storage");
+      })
+      .catch((error) => {
+        console.error("Error updating todos in sync.storage:", error);
+      });
+  }
 
   const handleReorder = (newOrder: ToDo[]) => {
     console.log("New order:", newOrder);
     const updatedOrder = newOrder.map((todo, index) => {
       return { ...todo, id: `todo_${index}`, order: index };
     });
+    console.log("Updated order:", updatedOrder);
+    // need to add completed todos to the end of the list so they don't get cleared out of state
+    const updatedOrderWithCompleted = [...updatedOrder, ...completedTodos];
 
-    dispatch({ type: "SET_TODO_STORAGE", payload: updatedOrder });
-    // You may want to update the order in storage as well
-    // newOrder.forEach((todo, index) => {
-    //   updateTodoInStorage({ ...todo, order: index }, false);
-    // });
-
-    // find the key in storage
-    // swap the contents of the two keys that have changed
-    // order 0 goes to todo_0
-    // order 1 goes to todo_1 etc...
+    dispatch({ type: "SET_TODO_STORAGE", payload: updatedOrderWithCompleted });
+    updateChromeStorage(updatedOrderWithCompleted);
   };
 
   // const activeTodos = state.todoStorage.filter((todo) => !todo.completed);
@@ -102,33 +87,41 @@ const TodoList: React.FC = () => {
 
   React.useEffect(() => {
     const active = state.todoStorage.filter((todo) => !todo.completed);
-    console.log("Active todos:", active);
     setActiveTodos(active);
   }, [state.todoStorage]);
 
   return (
-    <Box>
-      <AnimatePresence>
-        <Typography level="h4" sx={{ marginBottom: "16px" }}>
-          Active Tasks
-        </Typography>
-        <Reorder.Group
-          // onReorder={setActiveTodos}
-          onReorder={handleReorder}
-          values={activeTodos}
-          style={{
-            position: "relative",
-            listStyleType: "none",
-            margin: 0,
-            padding: 0,
-          }}
-        >
-          {activeTodos.length > 0 ? (
-            activeTodos.map((todo) => (
+    <Box
+      sx={{
+        overflowY: "scroll",
+        height: "calc(100vh - 150px)",
+      }}
+    >
+      {activeTodos.length > 0 ? (
+        <AnimatePresence>
+          <Typography
+            key="active-tasks-heading"
+            level="h4"
+            sx={{ marginBottom: "16px" }}
+          >
+            Active Tasks
+          </Typography>
+          <Reorder.Group
+            onReorder={handleReorder}
+            values={activeTodos}
+            axis="y"
+            style={{
+              position: "relative",
+              listStyleType: "none",
+              margin: 0,
+              padding: 0,
+            }}
+          >
+            {activeTodos.map((todo) => (
               <Reorder.Item
-                key={`${todo.dragId}`}
+                key={`active-${todo.dragId}`}
                 value={todo}
-                id={todo.id}
+                id={todo.dragId}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -147,7 +140,7 @@ const TodoList: React.FC = () => {
                   todo={todo}
                   editingId={editingId}
                   hoveredId={hoveredId}
-                  onCheck={handleCheck}
+                  onCheck={handleCheckCompleted}
                   onEdit={handleEdit}
                   onEditSave={handleEditSave}
                   onDelete={handleDelete}
@@ -156,64 +149,64 @@ const TodoList: React.FC = () => {
                   dragControls={dragControls}
                 />
               </Reorder.Item>
-            ))
-          ) : (
-            <ListItem>No active tasks available</ListItem>
-          )}
-        </Reorder.Group>
+            ))}
+          </Reorder.Group>
+        </AnimatePresence>
+      ) : (
+        <ListItem key="noActiveTasks">No active tasks</ListItem>
+      )}
 
-        {completedTodos.length > 0 && (
-          <>
-            <Typography
-              component={motion.h4}
-              level="h4"
-              sx={{ marginTop: "24px", marginBottom: "16px" }}
-              layout
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              Completed Tasks
-            </Typography>
+      {completedTodos.length > 0 && (
+        <AnimatePresence>
+          <Typography
+            key="completed-tasks-heading"
+            component={motion.h4}
+            level="h4"
+            sx={{ marginTop: "24px", marginBottom: "16px" }}
+            layout
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            Completed Tasks
+          </Typography>
 
-            <List>
-              {completedTodos.map((todo) => (
-                <ListItem
-                  key={todo.dragId}
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    background: theme.palette.background.level3,
-                    borderRadius: "8px",
-                    padding: "10px",
-                    marginBottom: "8px",
-                  }}
-                  component={motion.li}
-                  layout
-                  initial={{ opacity: 0, y: 50 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -50 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <TaskItem
-                    todo={todo}
-                    editingId={editingId}
-                    hoveredId={hoveredId}
-                    onCheck={handleCheck}
-                    onEdit={handleEdit}
-                    onEditSave={handleEditSave}
-                    onDelete={handleDelete}
-                    setHoveredId={setHoveredId}
-                    inputRef={inputRef}
-                    // dragRef={dragRef}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          </>
-        )}
-      </AnimatePresence>
+          <List>
+            {completedTodos.map((todo) => (
+              <ListItem
+                key={`completed-${todo.dragId}`}
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  background: theme.palette.background.level3,
+                  borderRadius: "8px",
+                  padding: "10px",
+                  marginBottom: "8px",
+                }}
+                component={motion.li}
+                layout
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -50 }}
+                transition={{ duration: 0.3 }}
+              >
+                <TaskItem
+                  todo={todo}
+                  editingId={editingId}
+                  hoveredId={hoveredId}
+                  onCheck={handleCheckCompleted}
+                  onEdit={handleEdit}
+                  onEditSave={handleEditSave}
+                  onDelete={handleDelete}
+                  setHoveredId={setHoveredId}
+                  inputRef={inputRef}
+                />
+              </ListItem>
+            ))}
+          </List>
+        </AnimatePresence>
+      )}
     </Box>
   );
 };
