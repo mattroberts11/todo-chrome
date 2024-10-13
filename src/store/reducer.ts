@@ -21,7 +21,7 @@ export const reducer = (state = initialState, action: Action): AppState => {
       return {
         ...state,
         todoStorage: state.todoStorage.map((todo) =>
-          todo.dragId === action.payload.dragId ? action.payload : todo,
+          todo.id === action.payload.id ? action.payload : todo,
         ),
       };
     case "DELETE_TODO": {
