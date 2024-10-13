@@ -6,10 +6,9 @@ import {
   Typography,
   Input,
   FormControl,
-  IconButton,
+  Chip,
 } from "@mui/joy";
 import { AppContext } from "../AppContext";
-import SaveIcon from "@mui/icons-material/Save";
 
 const TaskInput = ({
   initialValue,
@@ -43,7 +42,6 @@ const TaskInput = ({
   }, [inputRef]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("Input change event:", e.target.value); // Debug log
     const inputValue = (e.target as HTMLInputElement).value;
     if (inputValue.length <= 400) {
       setValue(inputValue);
@@ -75,14 +73,10 @@ const TaskInput = ({
   };
 
   const handleSave = useCallback(async () => {
-    console.log("Saving todo with value:", value); // Debug log
     if (value.trim() === "") {
       setError("The task cannot be empty");
       return;
     }
-    // TODO:
-    // check if the key from storage already exists
-    // if it does, increment the key by 1
 
     const todoId = (state.todoStorage?.length ?? 0).toString();
 
@@ -96,8 +90,6 @@ const TaskInput = ({
       dueDate: "",
       order: state.todoStorage?.length ?? 0,
     };
-
-    console.log("New todo object:", newTodo); // Debug log
 
     try {
       await storage.set({ [todoKey]: newTodo });
@@ -127,9 +119,14 @@ const TaskInput = ({
             color="primary"
             endDecorator={
               <>
-                <IconButton variant="soft">
-                  <SaveIcon />
-                </IconButton>
+                <Chip
+                  size="sm"
+                  variant="solid"
+                  color="neutral"
+                  sx={{ opacity: 0.7 }}
+                >
+                  Enter
+                </Chip>
               </>
             }
             slotProps={{

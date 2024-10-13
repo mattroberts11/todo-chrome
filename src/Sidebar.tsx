@@ -22,7 +22,9 @@ const Sidebar: React.FC = () => {
       const todos = Object.values(items).filter(
         (item) => item.id && item.id.startsWith("todo_"),
       );
-      dispatch({ type: "SET_TODO_STORAGE", payload: todos });
+      const sortedTodos = [...todos].sort((a, b) => a.order - b.order);
+
+      dispatch({ type: "SET_TODO_STORAGE", payload: sortedTodos });
     });
   };
 
