@@ -1,3 +1,5 @@
+import debounce from "lodash/debounce";
+
 export const updateTodoInStorage = (updatedTodo: ToDo) => {
   chrome.storage.sync.get(updatedTodo.id, (result) => {
     if (chrome.runtime.lastError) {
@@ -44,4 +46,15 @@ export const updateChromeStorage = (todoArray: TodoStorage) => {
     .catch((error) => {
       console.error("Error updating todos in sync.storage:", error);
     });
+};
+
+export const debouncedUpdateChromeStorage = debounce(updateChromeStorage, 1000);
+
+export const generateNewTodoId = (todoStorage: TodoStorage) => {
+  const largestIdNum = todoStorage.reduce((acc, todo) => {
+    const num = parseInt(todo.id.split("_")[1]);
+    return num > acc ? num : acc;
+  }, 0);
+
+  return `todo_${largestIdNum + 1}`;
 };

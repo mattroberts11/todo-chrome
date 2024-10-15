@@ -44,16 +44,22 @@ const TaskItem: React.FC<TaskItemProps> = ({
       />
       <Box
         className="todo-text-wrapper"
-        sx={{ display: "flex", flexDirection: "column", flexGrow: 1 }}
+        sx={{ display: "flex", flexDirection: "column", width: "100%" }}
       >
         <Box
           className="todo-text"
           sx={{
             overflowWrap: "anywhere",
-            "&:hover": { cursor: "pointer" },
+            "&:hover": {
+              cursor: todo.completed ? "default" : "pointer",
+            },
           }}
-          onClick={() => onEdit(todo.id)}
-          onMouseEnter={() => setHoveredId(todo.id)}
+          onClick={() => {
+            if (!todo.completed) onEdit(todo.id);
+          }}
+          onMouseEnter={() => {
+            if (!todo.completed) setHoveredId(todo.id);
+          }}
           onMouseLeave={() => setHoveredId(null)}
         >
           {editingId === todo.id ? (
@@ -72,20 +78,13 @@ const TaskItem: React.FC<TaskItemProps> = ({
               }}
             >
               {String(todo.text)}
-              <IconButton
-                variant="plain"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEdit(todo.id);
-                }}
+              <EditIcon
                 sx={{
                   fontSize: "12px",
                   display: hoveredId === todo.id ? "inline-flex" : "none",
+                  marginLeft: "5px",
                 }}
-                size="sm"
-              >
-                <EditIcon sx={{ fontSize: "14px" }} />
-              </IconButton>
+              />
             </Box>
           )}
         </Box>
@@ -95,7 +94,11 @@ const TaskItem: React.FC<TaskItemProps> = ({
           {!todo.completed ? (
             <IconButton
               onPointerDown={(e) => dragControls?.start(e)}
-              sx={{ cursor: "grab", marginRight: "5px" }}
+              sx={{
+                cursor: "grab",
+                marginRight: "5px",
+                display: editingId !== todo.id ? "inline-flex" : "none",
+              }}
             >
               <DragIndicatorIcon />
             </IconButton>

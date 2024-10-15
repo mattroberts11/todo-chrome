@@ -9,7 +9,7 @@ import {
   Reorder,
   useDragControls,
 } from "framer-motion";
-import { updateTodoInStorage } from "../lib/utils";
+import { debouncedUpdateChromeStorage } from "../lib/utils";
 import TaskItem from "./TaskItem";
 
 const TodoList: React.FC = () => {
@@ -28,9 +28,10 @@ const TodoList: React.FC = () => {
   };
 
   const handleCheckCompleted = (todo: ToDo) => {
-    const updatedTodo = { ...todo, completed: !todo.completed };
-    updateTodoInStorage(updatedTodo);
-    dispatch({ type: "UPDATE_TODO", payload: updatedTodo });
+    dispatch({
+      type: "UPDATE_TODO",
+      payload: { todo: todo, updateCompleted: true },
+    });
   };
 
   const handleEdit = (todoId: string) => {
@@ -41,45 +42,23 @@ const TodoList: React.FC = () => {
     const todoToUpdate = state.todoStorage.find((todo) => todo.id === todoId);
     if (todoToUpdate) {
       const updatedTodo = { ...todoToUpdate, text: newText };
-      updateTodoInStorage(updatedTodo);
-      dispatch({ type: "UPDATE_TODO", payload: updatedTodo });
+      dispatch({
+        type: "UPDATE_TODO",
+        payload: { todo: updatedTodo, updateCompleted: false },
+      });
     }
     setEditingId(null);
   };
 
-  function updateChromeStorage(todoArray: TodoStorage) {
-    const updatePromises = todoArray.map((todo) => {
-      return new Promise((resolve, reject) => {
-        chrome.storage.sync.set({ [todo.id]: todo }, () => {
-          if (chrome.runtime.lastError) {
-            reject(chrome.runtime.lastError);
-          } else {
-            resolve(void 0);
-          }
-        });
-      });
-    });
-
-    Promise.all(updatePromises)
-      .then(() => {
-        console.log("All todos updated successfully in sync.storage");
-      })
-      .catch((error) => {
-        console.error("Error updating todos in sync.storage:", error);
-      });
-  }
-
   const handleReorder = (newOrder: ToDo[]) => {
-    console.log("New order:", newOrder);
     const updatedOrder = newOrder.map((todo, index) => {
-      return { ...todo, id: `todo_${index}`, order: index };
+      return { ...todo, order: index };
     });
-    console.log("Updated order:", updatedOrder);
     // need to add completed todos to the end of the list so they don't get cleared out of state
     const updatedOrderWithCompleted = [...updatedOrder, ...completedTodos];
 
     dispatch({ type: "SET_TODO_STORAGE", payload: updatedOrderWithCompleted });
-    updateChromeStorage(updatedOrderWithCompleted);
+    debouncedUpdateChromeStorage(updatedOrderWithCompleted);
   };
 
   // const activeTodos = state.todoStorage.filter((todo) => !todo.completed);
@@ -94,6 +73,19 @@ const TodoList: React.FC = () => {
     <Box
       sx={{
         overflowY: "scroll",
+        "&::-webkit-scrollbar": {
+          width: "0.4em",
+        },
+        "&::-webkit-scrollbar-track": {
+          marginLeft: "4px",
+          width: "0.5em",
+          boxShadow: "inset 0 0 6px rgba(0,0,0,0.00)",
+          webkitBoxShadow: "inset 0 0 6px rgba(0,0,0,0.00)",
+        },
+        "&::-webkit-scrollbar-thumb": {
+          backgroundColor: theme.palette.background.level2,
+          borderRadius: "8px",
+        },
         height: "calc(100vh - 150px)",
       }}
     >
@@ -113,7 +105,7 @@ const TodoList: React.FC = () => {
             style={{
               position: "relative",
               listStyleType: "none",
-              margin: 0,
+              margin: "0 5px 0 0",
               padding: 0,
             }}
           >
@@ -172,7 +164,7 @@ const TodoList: React.FC = () => {
             Completed Tasks
           </Typography>
 
-          <List>
+          <List sx={{ margin: "0 5px 0 0" }}>
             {completedTodos.map((todo) => (
               <ListItem
                 key={`completed-${todo.dragId}`}
