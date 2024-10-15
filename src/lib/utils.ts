@@ -45,3 +45,12 @@ export const updateChromeStorage = (todoArray: TodoStorage) => {
       console.error("Error updating todos in sync.storage:", error);
     });
 };
+
+export const generateNewTodoId = (todoStorage: TodoStorage) => {
+  const largestIdNum = todoStorage.reduce((acc, todo) => {
+    const num = parseInt(todo.id.split("_")[1]);
+    return num > acc ? num : acc;
+  }, 0);
+
+  return `todo_${largestIdNum + 1}`;
+};

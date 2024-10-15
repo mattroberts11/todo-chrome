@@ -1,4 +1,5 @@
 import { initialState } from "./initialState";
+import { updateChromeStorage } from "../lib/utils";
 
 export const reducer = (state = initialState, action: Action): AppState => {
   switch (action.type) {
@@ -17,13 +18,33 @@ export const reducer = (state = initialState, action: Action): AppState => {
         ...state,
         todoStorage: [...state.todoStorage, action.payload],
       };
-    case "UPDATE_TODO":
+    case "UPDATE_TODO": {
+      const toDoToUpdate = action.payload.todo as ToDo;
+      let updatedTodoData: TodoStorage;
+      if (action.payload.updateCompleted) {
+        const newOrder = state.todoStorage.length;
+        updatedTodoData = state.todoStorage.map((todo) =>
+          todo.id === toDoToUpdate.id
+            ? {
+                ...toDoToUpdate,
+                order: newOrder,
+                completed: !toDoToUpdate.completed,
+              }
+            : todo,
+        );
+      } else {
+        updatedTodoData = state.todoStorage.map((todo) =>
+          todo.id === toDoToUpdate.id ? toDoToUpdate : todo,
+        );
+      }
+      // update the chrome storage
+      updateChromeStorage(updatedTodoData);
       return {
         ...state,
-        todoStorage: state.todoStorage.map((todo) =>
-          todo.id === action.payload.id ? action.payload : todo,
-        ),
+        todoStorage: updatedTodoData,
       };
+    }
+
     case "DELETE_TODO": {
       const newTodoStorage = state.todoStorage.filter(
         (todo) => todo.id !== action.payload,

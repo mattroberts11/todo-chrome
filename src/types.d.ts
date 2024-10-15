@@ -8,7 +8,7 @@ type Action =
   | { type: "SET_TODO"; payload: ToDo }
   | { type: "CLEAR_TODO" }
   | { type: "ADD_TODO"; payload: ToDo }
-  | { type: "UPDATE_TODO"; payload: ToDo }
+  | { type: "UPDATE_TODO"; payload: { todo: ToDo; updateCompleted: boolean } }
   | { type: "DELETE_TODO"; payload: string };
 
 // Application state
