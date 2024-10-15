@@ -9,7 +9,7 @@ import {
   Reorder,
   useDragControls,
 } from "framer-motion";
-import { updateChromeStorage } from "../lib/utils";
+import { debouncedUpdateChromeStorage } from "../lib/utils";
 import TaskItem from "./TaskItem";
 
 const TodoList: React.FC = () => {
@@ -58,7 +58,7 @@ const TodoList: React.FC = () => {
     const updatedOrderWithCompleted = [...updatedOrder, ...completedTodos];
 
     dispatch({ type: "SET_TODO_STORAGE", payload: updatedOrderWithCompleted });
-    updateChromeStorage(updatedOrderWithCompleted);
+    debouncedUpdateChromeStorage(updatedOrderWithCompleted);
   };
 
   // const activeTodos = state.todoStorage.filter((todo) => !todo.completed);
