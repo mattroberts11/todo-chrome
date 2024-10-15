@@ -11,6 +11,7 @@ const MainPanel: React.FC = () => {
       sx={{
         boxSizing: "border-box",
         height: "100%",
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         flexGrow: 1,
