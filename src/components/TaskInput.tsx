@@ -9,6 +9,7 @@ import {
   Chip,
 } from "@mui/joy";
 import { AppContext } from "../AppContext";
+import { generateNewTodoId } from "../lib/utils";
 
 const TaskInput = ({
   initialValue,
@@ -31,7 +32,6 @@ const TaskInput = ({
   const [value, setValue] = useState<string>(initialValue);
   const [error, setError] = useState<string | null>(null);
   const [remainingChars, setRemainingChars] = useState<number | null>(null);
-  const dragId = React.useId();
 
   const storage = chrome.storage.sync;
 
@@ -77,12 +77,13 @@ const TaskInput = ({
       setError("The task cannot be empty");
       return;
     }
+    // generate a random number for the dragId
+    const dragId = Math.floor(Math.random() * 1000000).toString();
 
-    const todoId = (state.todoStorage?.length ?? 0).toString();
+    const newTodoId = generateNewTodoId(state.todoStorage);
 
-    const todoKey = "todo_" + todoId;
     const newTodo: ToDo = {
-      id: todoKey,
+      id: newTodoId,
       text: value,
       completed: false,
       dateAdded: new Date().toISOString(),
@@ -92,10 +93,9 @@ const TaskInput = ({
     };
 
     try {
-      await storage.set({ [todoKey]: newTodo });
+      await storage.set({ [newTodoId]: newTodo });
       dispatch({ type: "ADD_TODO", payload: newTodo });
       dispatch({ type: "SET_IS_ADDING_TODO", payload: false });
-      // setValue(""); // Clear the input after saving
     } catch (error) {
       console.error("Error saving todo:", error);
     } finally {
@@ -105,7 +105,6 @@ const TaskInput = ({
 
   const handleCancel = () => {
     dispatch({ type: "SET_IS_ADDING_TODO", payload: false });
-    setValue(""); // Clear the input on cancel
     setError(null); // clear any errors
   };
 
