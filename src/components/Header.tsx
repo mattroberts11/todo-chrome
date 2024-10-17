@@ -11,7 +11,7 @@ const Header: React.FC = () => (
       justifyContent: "space-between",
       alignItems: "center",
       height: "54px",
-      p: 1,
+      p: 0,
       top: 0,
       position: "sticky",
     }}

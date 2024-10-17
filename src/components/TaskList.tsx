@@ -72,6 +72,7 @@ const TodoList: React.FC = () => {
   return (
     <Box
       sx={{
+        height: "calc(100vh - 137px)",
         overflowY: "scroll",
         "&::-webkit-scrollbar": {
           width: "0.4em",
@@ -86,7 +87,6 @@ const TodoList: React.FC = () => {
           backgroundColor: theme.palette.background.level2,
           borderRadius: "8px",
         },
-        height: "calc(100vh - 150px)",
       }}
     >
       {activeTodos.length > 0 ? (
@@ -123,7 +123,7 @@ const TodoList: React.FC = () => {
                   flexDirection: "row",
                   background: theme.palette.background.level3,
                   borderRadius: "8px",
-                  padding: "10px",
+                  padding: "10px 5px 10px 10px",
                   marginBottom: "8px",
                   alignItems: "center",
                 }}

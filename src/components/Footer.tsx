@@ -59,7 +59,7 @@ const Footer: React.FC = () => {
         justifyContent: "space-between",
         alignItems: "center",
         height: "64px",
-        p: 1,
+        p: 0,
         bottom: 0,
         position: "sticky",
       }}
